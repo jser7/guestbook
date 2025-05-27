@@ -21,9 +21,9 @@ const supabase = createClient(
 
 console.log('✅ Supabase client initialized');
 
-// Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public'))
 
 // Test Supabase connection
 async function testConnection() {
