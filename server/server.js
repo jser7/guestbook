@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { createClient } = require('@supabase/supabase-js');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -21,15 +22,29 @@ const supabase = createClient(
 
 console.log('✅ Supabase client initialized');
 
-app.use(cors());
+// CORS configuration - allow your frontend domain
+app.use(cors({
+  origin: ['https://guestbook-1-0wnj.onrender.com', 'http://localhost:3000'],
+  credentials: true
+}));
+
 app.use(express.json());
-app.use(express.static('public'))
+
+// Serve static files with proper MIME types
+app.use(express.static('public', {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css');
+    }
+  }
+}));
 
 // Test Supabase connection
 async function testConnection() {
   try {
+    // Change 'guestbook' to 'messages' if that's your table name
     const { data, error } = await supabase
-      .from('guestbook')
+      .from('messages')  // Make sure this matches your table name
       .select('count', { count: 'exact' });
     
     if (error) {
@@ -58,7 +73,7 @@ app.get('/api/messages', async (req, res) => {
   console.log('📖 Fetching messages from Supabase...');
   try {
     const { data, error } = await supabase
-      .from('guestbook')
+      .from('messages')  // Make sure this matches your table name
       .select('*')
       .order('created_at', { ascending: false });
     
@@ -86,7 +101,7 @@ app.post('/api/messages', async (req, res) => {
     }
     
     const { data, error } = await supabase
-      .from('guestbook')
+      .from('messages')  // Make sure this matches your table name
       .insert([{ name: name.trim(), message: message.trim() }])
       .select();
     
@@ -101,6 +116,11 @@ app.post('/api/messages', async (req, res) => {
     console.error('❌ Server error:', error);
     res.status(500).json({ error: 'Server error' });
   }
+});
+
+// Serve frontend files (if this is a full-stack app)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.listen(PORT, () => {
