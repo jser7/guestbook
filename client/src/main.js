@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api'; // Change this when deployed
+const API_URL = 'https://zkzzpjdpkgulwsfydaux.supabase.co'; // Change this when deployed
 
 const form = document.getElementById('guestbook-form');
 const messagesContainer = document.getElementById('messages');
