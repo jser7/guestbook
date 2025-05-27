@@ -36,15 +36,23 @@ app.use(express.static('public', {
     if (path.endsWith('.css')) {
       res.setHeader('Content-Type', 'text/css');
     }
+    if (path.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    }
   }
 }));
+
+// Alternative CSS fix - add explicit route
+app.get('/style.css', (req, res) => {
+  res.setHeader('Content-Type', 'text/css');
+  res.sendFile(path.join(__dirname, 'public', 'style.css'));
+});
 
 // Test Supabase connection
 async function testConnection() {
   try {
-    // Change 'guestbook' to 'messages' if that's your table name
     const { data, error } = await supabase
-      .from('messages')  // Make sure this matches your table name
+      .from('guestbook')  // Your actual table name
       .select('count', { count: 'exact' });
     
     if (error) {
@@ -73,7 +81,7 @@ app.get('/api/messages', async (req, res) => {
   console.log('📖 Fetching messages from Supabase...');
   try {
     const { data, error } = await supabase
-      .from('messages')  // Make sure this matches your table name
+      .from('guestbook')  // Your actual table name
       .select('*')
       .order('created_at', { ascending: false });
     
@@ -101,7 +109,7 @@ app.post('/api/messages', async (req, res) => {
     }
     
     const { data, error } = await supabase
-      .from('messages')  // Make sure this matches your table name
+      .from('guestbook')  // Your actual table name
       .insert([{ name: name.trim(), message: message.trim() }])
       .select();
     
