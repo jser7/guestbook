@@ -1,4 +1,5 @@
-const API_URL = 'https://zkzzpjdpkgulwsfydaux.supabase.co'; // Change this when deployed
+// Change this to your deployed backend URL, not Supabase directly
+const API_URL = 'https://guestbook-1-0wnj.onrender.com'; // Your deployed backend
 
 const form = document.getElementById('guestbook-form');
 const messagesContainer = document.getElementById('messages');
@@ -14,7 +15,7 @@ form.addEventListener('submit', async (e) => {
     const message = document.getElementById('message').value;
     
     try {
-        const response = await fetch(`${API_URL}/messages`, {
+        const response = await fetch(`${API_URL}/api/messages`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -25,6 +26,8 @@ form.addEventListener('submit', async (e) => {
         if (response.ok) {
             form.reset();
             loadMessages(); // Refresh messages
+        } else {
+            console.error('Failed to submit message');
         }
     } catch (error) {
         console.error('Error:', error);
@@ -34,7 +37,7 @@ form.addEventListener('submit', async (e) => {
 // Load and display messages
 async function loadMessages() {
     try {
-        const response = await fetch(`${API_URL}/messages`);
+        const response = await fetch(`${API_URL}/api/messages`);
         const messages = await response.json();
         
         messagesContainer.innerHTML = messages.map(msg => `
